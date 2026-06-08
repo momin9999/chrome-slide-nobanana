@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="options.css" />
+    <title>Slides NoBanana — 詳細設定</title>
+  </head>
+  <body>
+    <main>
+      <h1>Slides NoBanana 詳細設定</h1>
+      <p class="lead">
+        Google スライドの「Beautify this slide（スライドを改善 / 生成）」ボタンを
+        非表示にします。ボタンはアクセシビリティ名（aria-label・ツールチップ・テキスト）で
+        判定するため、Google 側のクラス名が変わっても動作します。
+      </p>
+
+      <section>
+        <h2>標準ラベル</h2>
+        <p class="desc">
+          以下のいずれかを含むボタンを自動的に非表示にします（大文字小文字は無視）。
+          ポップアップの「標準ラベルで自動的に消す」がオンのときに有効です。
+        </p>
+        <ul id="builtinList" class="chips"></ul>
+      </section>
+
+      <section>
+        <h2>登録したボタン（クリックで選択した分）</h2>
+        <p class="desc">
+          ポップアップの「ボタンを選択して消す」で登録したラベルです。下の欄に手入力で
+          追加することもできます。
+        </p>
+        <ul id="customList" class="list"></ul>
+        <div class="addrow">
+          <input
+            type="text"
+            id="addInput"
+            placeholder="例: Beautify this slide / このスライドを改善"
+          />
+          <button id="addBtn" class="primary">追加</button>
+        </div>
+      </section>
+
+      <section class="dangerzone">
+        <button id="resetBtn" class="danger">すべて初期状態に戻す</button>
+        <span id="savedMsg" class="saved" hidden>保存しました</span>
+      </section>
+    </main>
+
+    <script src="defaults.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

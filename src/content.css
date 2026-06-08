@@ -1,0 +1,33 @@
+/* Slides NoBanana — injected styles.
+ *
+ * 1. Flicker-free hiding of the well-known English "Beautify this slide" button
+ *    via attribute selectors, so it never paints even before content.js runs.
+ *    (CSS can only match attributes, not text, so locale variants and custom
+ *    picks are handled by content.js / the .nobanana-hidden class instead.)
+ * 2. The class content.js toggles on anything it decides to hide.
+ * 3. A subtle highlight while "pick mode" is active. */
+
+/* Gated by the .nobanana-builtin class on <html>, which content.js toggles to
+ * honor the "enabled" + "use built-in labels" settings. */
+html.nobanana-builtin [aria-label*="Beautify this slide" i],
+html.nobanana-builtin [data-tooltip*="Beautify this slide" i],
+html.nobanana-builtin [aria-label*="Beautify slide" i],
+html.nobanana-builtin [data-tooltip*="Beautify slide" i] {
+  display: none !important;
+}
+
+.nobanana-hidden {
+  display: none !important;
+}
+
+/* Pick mode: signal that the next click selects a button to hide. */
+html.nobanana-pick,
+html.nobanana-pick * {
+  cursor: crosshair !important;
+}
+
+html.nobanana-pick [role="button"]:hover,
+html.nobanana-pick button:hover {
+  outline: 2px solid #e03131 !important;
+  outline-offset: 1px;
+}
