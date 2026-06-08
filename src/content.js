@@ -1,15 +1,16 @@
 // Slides NoBanana — content script.
 //
-// Hides the Gemini / Nano Banana "Beautify this slide" button that Google
-// Slides renders between the slide canvas and the speaker-notes area. Google's
-// class names are obfuscated and change often, so we identify the button by its
-// accessible name (aria-label / tooltip / text) rather than by class. A
-// MutationObserver keeps it hidden as the single-page app re-renders and as the
-// user switches slides.
+// Hides the Gemini / Nano Banana generative-AI "nudge" button ("このスライドを
+// ブラッシュアップ" / "Beautify this slide") that Google Slides renders between
+// the slide canvas and the speaker-notes area. It is identified by two signals:
+//   1. The descriptive "GenerativeAiNudgeButton" CSS class (locale-independent).
+//   2. Its accessible name (aria-label / tooltip / text) as a backup.
+// When a match is found we collapse the whole nudge container so the button,
+// its × dismiss control and ripple all disappear. A MutationObserver keeps it
+// hidden as the single-page app re-renders and as the user switches slides.
 //
 // A "pick mode" lets the user click the button once to capture a stable
-// signature for it — useful when the on-screen label differs from our built-in
-// list (e.g. a locale we didn't anticipate).
+// signature for it — useful if the class and labels ever change.
 
 (function () {
   "use strict";
@@ -87,24 +88,58 @@
       });
   }
 
+  // Read class as a plain string (SVG elements expose className as an object).
+  function classOf(el) {
+    return (el && el.getAttribute && el.getAttribute("class")) || "";
+  }
+
+  // Given a matched element, hide the outermost nudge container so the button,
+  // its × dismiss control and the ripple all disappear together (and we don't
+  // leave an empty, space-consuming wrapper between the slide and the notes).
+  function hideTarget(el) {
+    let root =
+      el.closest && el.closest("." + NB.NUDGE_ROOT_CLASS);
+    if (!root) {
+      // Walk up while the parent is still tagged as the gen-AI nudge.
+      let node = el;
+      while (
+        node.parentElement &&
+        /GenerativeAiNudgeButton/.test(classOf(node.parentElement))
+      ) {
+        node = node.parentElement;
+      }
+      root = /GenerativeAiNudgeButton/.test(classOf(el)) ? node : el;
+    }
+    hide(root);
+  }
+
   // Candidate elements: button-like roles plus anything carrying an accessible
-  // label/tooltip (the beautify chip is sometimes a labeled container, not a
-  // <button>). We still only hide on a specific label match, so this stays safe
-  // and survives re-renders when switching slides.
+  // label/tooltip (the chip is sometimes a labeled container, not a <button>).
+  // We still only hide on a specific label match, so this stays safe and
+  // survives re-renders when switching slides.
   const CANDIDATE_SELECTOR =
     '[role="button"], button, [aria-label], [data-tooltip]';
 
-  function scan(root) {
+  function scan() {
     if (!settings.enabled) return;
-    const scope = root && root.querySelectorAll ? root : document;
+    // 1. Stable class-based signal (locale-independent), part of the built-in
+    //    ruleset so it follows the "use built-in" toggle.
+    if (settings.useBuiltin) {
+      try {
+        document.querySelectorAll(NB.NUDGE_SELECTOR).forEach(hideTarget);
+      } catch (e) {
+        /* ignore selector/DOM errors */
+      }
+    }
+    // 2. Label-based matching (built-in labels + user picks).
     let nodes;
     try {
-      nodes = scope.querySelectorAll(CANDIDATE_SELECTOR);
+      nodes = document.querySelectorAll(CANDIDATE_SELECTOR);
     } catch (e) {
       return;
     }
     for (const el of nodes) {
-      if (shouldHide(el)) hide(el);
+      if (shouldHide(el)) hideTarget(el);
     }
   }
 
@@ -116,7 +151,7 @@
     scanQueued = true;
     requestAnimationFrame(() => {
       scanQueued = false;
-      scan(document);
+      scan();
     });
   }
 
@@ -135,7 +170,7 @@
       attributes: true,
       attributeFilter: ["aria-label", "data-tooltip", "title"],
     });
-    scan(document);
+    scan();
   }
 
   // ---- pick mode ----------------------------------------------------------
@@ -173,7 +208,7 @@
         settings.custom = custom;
         save();
       }
-      hide(target);
+      hideTarget(target);
     }
   }
 
@@ -233,7 +268,7 @@
       !!(settings.enabled && settings.useBuiltin)
     );
     unhideAll();
-    if (settings.enabled) scan(document);
+    if (settings.enabled) scan();
   }
 
   function load() {
@@ -261,7 +296,7 @@
       sendResponse && sendResponse({ ok: true });
     } else if (msg.type === "nobanana:rescan") {
       unhideAll();
-      scan(document);
+      scan();
       sendResponse && sendResponse({ ok: true });
     }
     return true;

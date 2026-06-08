@@ -1,18 +1,22 @@
 # Slides NoBanana 🍌🚫
 
-Google スライドの **「Beautify this slide（スライドを改善 / 生成）」ボタン** を
-非表示にする Chrome 拡張機能です。このボタンは、スライド編集領域と
-スピーカーノートの **間** に表示される、Gemini / Nano Banana による
-生成 AI ボタンです。これを画面から消します。
+Google スライドの **「このスライドをブラッシュアップ」ボタン**（英語版:
+`Beautify this slide`）を非表示にする Chrome 拡張機能です。このボタンは、
+スライド編集領域とスピーカーノートの **間** に表示される、Gemini / Nano Banana
+による生成 AI ボタン（内部的には "GenerativeAiNudgeButton" という nudge）です。
+これを ✕ 閉じるボタンごと画面から消します。
 
 > 右上の「Gemini に相談（Ask Gemini）」キラキラボタンは **消しません**。
 > あくまでスライドとノートの間に出るボタンだけが対象です。
 
 ## 特長
 
-- **クラス名に依存しない**：Google 側の難読化クラス名が変わっても動くよう、
-  ボタンの**アクセシビリティ名（aria-label / ツールチップ / テキスト）**で判定します。
-- **ちらつきなし**：英語表記の `Beautify this slide` は CSS で即時に非表示。
+- **2 重の判定で堅牢**：
+  - 主：Google が付けている記述的クラス **`GenerativeAiNudgeButton`**（難読化された
+    短いクラスではないため比較的安定。ロケールにも依存しません）。
+  - 副：**アクセシビリティ名**（aria-label / ツールチップ / テキスト。確認済みの実ラベルは
+    `このスライドをブラッシュアップ`）。
+- **ちらつきなし**：上記クラスを CSS で即時に非表示（コンテナごと消すので空白も残りません）。
 - **SPA 対応**：スライドを切り替えても `MutationObserver` で消し続けます。
 - **ラベルが分からなくても消せる「選択モード」**：ポップアップのボタンを押して、
   消したいボタンを 1 回クリックするだけで登録・非表示にできます（誤作動なし）。
@@ -60,14 +64,16 @@ Google スライドの **「Beautify this slide（スライドを改善 / 生成
 | --- | --- |
 | `manifest.json` | Manifest V3 定義。`docs.google.com/presentation/*` で実行。 |
 | `src/defaults.js` | 共有設定（標準ラベル、保護ラベル、ストレージキー）。 |
-| `src/content.js` | ボタン検出・非表示・選択モードの本体。 |
-| `src/content.css` | 英語ラベルの即時非表示＋選択モードの見た目。 |
+| `src/content.js` | ボタン検出・非表示（コンテナごと）・選択モードの本体。 |
+| `src/content.css` | `GenerativeAiNudgeButton` クラス等の即時非表示＋選択モードの見た目。 |
 | `src/popup.*` | ツールバーのポップアップ UI。 |
 | `src/options.*` | 詳細設定ページ（登録ラベルの管理）。 |
 | `icons/` | アイコン（`tools/generate_icons.py` で生成）。 |
 
-判定対象は `aria-label` / `data-tooltip` / `title` / テキストで、
-`Ask Gemini`・`Gemini に相談` は常に保護対象（消さない）です。
+ラベル判定対象は `aria-label` / `data-tooltip` / `title` / テキストで、
+`Ask Gemini`・`Gemini に相談` は常に保護対象（消さない）です。一致した要素は、
+最も外側の nudge コンテナ（`appsElementsGenerativeAiNudgeButtonNudgeRoot`）まで
+さかのぼってまとめて非表示にします。
 
 ## 開発メモ
 

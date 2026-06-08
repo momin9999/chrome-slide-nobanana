@@ -3,16 +3,32 @@
 // <script> tag in the popup/options pages. Works in either context by attaching
 // to the global object.
 (function (root) {
+  // Stable, locale-independent selector for the generative-AI nudge. Google
+  // gives this feature descriptive class names (not the obfuscated short ones),
+  // e.g. the confirmed DOM:
+  //   <div class="appsElementsGenerativeAiNudgeButtonNudgeRoot ...">
+  //     <div role="button" aria-label="このスライドをブラッシュアップ" ...>
+  //   ...
+  // Matching the "GenerativeAiNudgeButton" class works regardless of the UI
+  // language and survives minor suffix renames. content.js / content.css hide
+  // the whole nudge container so the button, its dismiss (×) and ripple all go.
+  const NUDGE_SELECTOR = '[class*="GenerativeAiNudgeButton"]';
+  // The outer container we collapse when hiding (preferred over inner button).
+  const NUDGE_ROOT_CLASS = "appsElementsGenerativeAiNudgeButtonNudgeRoot";
+
   // Substrings matched (case-insensitive, whitespace-collapsed) against a
   // button's accessible name: aria-label, data-tooltip, title, then text.
-  // Target: the Gemini / Nano Banana "Beautify this slide" button that appears
-  // between the slide canvas and the speaker notes. We deliberately list the
-  // long, specific phrases so we never touch unrelated controls.
+  // Backup signal for when the class above ever changes; the confirmed live
+  // label is "このスライドをブラッシュアップ".
   const DEFAULT_LABELS = [
-    // English
+    // English (wording varies by rollout)
     "beautify this slide",
     "beautify slide",
-    // Japanese (exact wording varies by rollout; these are the likely variants)
+    "brush up this slide",
+    "brush up slide",
+    // Japanese — confirmed live label + likely variants
+    "このスライドをブラッシュアップ",
+    "ブラッシュアップ",
     "このスライドを改善",
     "スライドを改善",
     "スライドを美しく",
@@ -26,13 +42,15 @@
 
   root.NOBANANA = root.NOBANANA || {};
   Object.assign(root.NOBANANA, {
+    NUDGE_SELECTOR: NUDGE_SELECTOR,
+    NUDGE_ROOT_CLASS: NUDGE_ROOT_CLASS,
     DEFAULT_LABELS: DEFAULT_LABELS,
     NEVER_LABELS: NEVER_LABELS,
     STORAGE_KEY: "nobanana_settings",
     // Default persisted settings.
     DEFAULTS: {
       enabled: true, // master on/off
-      useBuiltin: true, // use the built-in DEFAULT_LABELS list
+      useBuiltin: true, // use the built-in nudge selector + label list
       custom: [], // user-added signatures: [{ type: "label", value: "..." }]
     },
   });

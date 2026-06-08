@@ -27,6 +27,13 @@ const cases = [
   // [accessibleName, settings, expectedHidden, description]
   ["Beautify this slide", {}, true, "English beautify button"],
   ["auto_awesome Beautify this slide", {}, true, "with icon ligature prefix"],
+  ["このスライドをブラッシュアップ", {}, true, "confirmed live JA label"],
+  [
+    "このスライドをブラッシュアップ を閉じる",
+    {},
+    true,
+    "the dismiss (×) button label also matches",
+  ],
   ["このスライドを改善", {}, true, "Japanese improve-slide button"],
   ["スライドを改善する", {}, true, "Japanese improve variant (suffix)"],
   ["Ask Gemini", {}, false, "Ask Gemini must be preserved"],

@@ -8,7 +8,15 @@
  * 3. A subtle highlight while "pick mode" is active. */
 
 /* Gated by the .nobanana-builtin class on <html>, which content.js toggles to
- * honor the "enabled" + "use built-in labels" settings. */
+ * honor the "enabled" + "use built-in labels" settings.
+ *
+ * Primary signal: the descriptive "GenerativeAiNudgeButton" class that Google
+ * gives this feature. Hiding it (and its children) collapses the whole nudge —
+ * the "このスライドをブラッシュアップ" button, its × dismiss, and the ripple —
+ * flicker-free and independent of the UI language. The aria-label rules are a
+ * backup if the class is ever renamed. */
+html.nobanana-builtin [class*="GenerativeAiNudgeButton"],
+html.nobanana-builtin [aria-label*="ブラッシュアップ"],
 html.nobanana-builtin [aria-label*="Beautify this slide" i],
 html.nobanana-builtin [data-tooltip*="Beautify this slide" i],
 html.nobanana-builtin [aria-label*="Beautify slide" i],
