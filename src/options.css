@@ -1,8 +1,46 @@
+/* Slides NoBanana — options page.
+ * Apple-inspired: system fonts, calm neutrals, soft cards, generous spacing.
+ * Adapts to light/dark via prefers-color-scheme. */
+
 :root {
-  --red: #e03131;
-  --ink: #202124;
-  --muted: #5f6368;
-  --line: #e8eaed;
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --faint: #86868b;
+  --line: rgba(0, 0, 0, 0.1);
+  --hairline: rgba(0, 0, 0, 0.07);
+  --accent: #0071e3;
+  --accent-press: #0062c4;
+  --danger: #ff3b30;
+  --chip-bg: rgba(0, 113, 227, 0.08);
+  --chip-ink: #0062c4;
+  --chip-line: rgba(0, 113, 227, 0.22);
+  --field: #ffffff;
+  --ok: #1a9e4b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.06);
+  --radius: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1e;
+    --surface: #2c2c2e;
+    --ink: #f5f5f7;
+    --muted: #aeaeb2;
+    --faint: #8e8e93;
+    --line: rgba(255, 255, 255, 0.14);
+    --hairline: rgba(255, 255, 255, 0.09);
+    --accent: #2997ff;
+    --accent-press: #0a84ff;
+    --danger: #ff453a;
+    --chip-bg: rgba(41, 151, 255, 0.16);
+    --chip-ink: #7fbcff;
+    --chip-line: rgba(41, 151, 255, 0.32);
+    --field: #1c1c1e;
+    --ok: #30d158;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
 }
 
 * {
@@ -11,47 +49,58 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", "Helvetica Neue", "Hiragino Kaku Gothic ProN",
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
     "Yu Gothic UI", Meiryo, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
   color: var(--ink);
-  background: #f8f9fa;
+  background: var(--bg);
+  letter-spacing: -0.01em;
 }
 
 main {
-  max-width: 640px;
+  max-width: 660px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 56px 24px 80px;
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
 }
 
 .lead {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
+  margin: 0 0 8px;
 }
 
 section {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-top: 18px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px 26px;
+  margin-top: 20px;
 }
 
 h2 {
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   margin: 0 0 6px;
 }
 
 .desc {
-  margin: 0 0 12px;
-  font-size: 12px;
+  margin: 0 0 16px;
+  font-size: 13px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
 }
+
+/* ---- chips (built-in labels) ------------------------------------------- */
 
 .chips {
   list-style: none;
@@ -63,17 +112,20 @@ h2 {
 }
 
 .chips li {
-  background: #fff8e1;
-  border: 1px solid #ffe08a;
-  color: #6b5a12;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-line);
+  color: var(--chip-ink);
   border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 12px;
+  padding: 5px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
 }
+
+/* ---- custom list -------------------------------------------------------- */
 
 .list {
   list-style: none;
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   padding: 0;
 }
 
@@ -82,72 +134,108 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  padding: 11px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
   margin-bottom: 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   word-break: break-all;
 }
 
 .list .empty {
-  color: var(--muted);
+  color: var(--faint);
   border-style: dashed;
   justify-content: center;
 }
 
+/* ---- add row ------------------------------------------------------------ */
+
 .addrow {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 #addInput {
   flex: 1;
-  padding: 9px 12px;
-  border: 1px solid #c9ccd1;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 11px 14px;
+  color: var(--ink);
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  font-size: 13.5px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#addInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.18);
 }
 
 button.primary {
-  padding: 9px 16px;
-  font-size: 13px;
+  padding: 11px 20px;
+  font-size: 13.5px;
   font-weight: 600;
   color: #fff;
-  background: var(--red);
+  background: var(--accent);
   border: none;
-  border-radius: 8px;
+  border-radius: 11px;
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+button.primary:hover {
+  background: var(--accent-press);
+}
+
+button.primary:active {
+  transform: scale(0.985);
 }
 
 button.remove {
   background: none;
   border: none;
-  color: var(--red);
+  color: var(--danger);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 7px;
 }
+
+button.remove:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+/* ---- danger zone -------------------------------------------------------- */
 
 .dangerzone {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   background: none;
-  border: none;
-  padding: 8px 0;
+  box-shadow: none;
+  padding: 12px 2px;
 }
 
 button.danger {
-  padding: 9px 16px;
-  font-size: 13px;
-  color: var(--red);
-  background: #fff;
-  border: 1px solid var(--red);
-  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--danger);
+  background: var(--surface);
+  border: 1px solid var(--danger);
+  border-radius: 11px;
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+button.danger:hover {
+  background: rgba(255, 59, 48, 0.08);
 }
 
 .saved {
-  color: #1e8e3e;
-  font-size: 12px;
+  color: var(--ok);
+  font-size: 13px;
+  font-weight: 500;
 }

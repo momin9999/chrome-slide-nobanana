@@ -8,38 +8,49 @@
   </head>
   <body>
     <header class="header">
-      <img src="../icons/icon48.png" alt="" width="28" height="28" />
-      <div>
+      <img class="header__icon" src="../icons/icon48.png" alt="" width="34" height="34" />
+      <div class="header__text">
         <h1>Slides NoBanana</h1>
         <p class="sub">「Beautify this slide」ボタンを非表示</p>
       </div>
     </header>
 
-    <label class="row toggle">
-      <span>拡張機能を有効にする</span>
-      <input type="checkbox" id="enabled" />
-      <span class="switch" aria-hidden="true"></span>
-    </label>
+    <section class="card">
+      <label class="row toggle">
+        <span class="row__label">拡張機能を有効にする</span>
+        <input type="checkbox" id="enabled" />
+        <span class="switch" aria-hidden="true"></span>
+      </label>
 
-    <label class="row toggle">
-      <span>標準ラベルで自動的に消す</span>
-      <input type="checkbox" id="useBuiltin" />
-      <span class="switch" aria-hidden="true"></span>
-    </label>
+      <label class="row toggle">
+        <span class="row__label">標準ラベルで自動的に消す</span>
+        <input type="checkbox" id="useBuiltin" />
+        <span class="switch" aria-hidden="true"></span>
+      </label>
 
-    <div class="pick-block">
+      <label class="row toggle row--last">
+        <span class="row__label">
+          スピーカーノートを少し広げる
+          <small class="row__note">編集画面のノート欄を開いた状態で表示</small>
+        </span>
+        <input type="checkbox" id="notesBoost" />
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section class="pick-block">
       <button id="pick" class="primary">ボタンを選択して消す</button>
       <p class="hint">
         ラベルが分からなくても確実に消せます。押した後、Google
         スライドのタブに戻り、消したいボタンを 1 回クリックしてください。
       </p>
       <p id="pickStatus" class="pickStatus" hidden></p>
-    </div>
+    </section>
 
-    <div class="row footer">
+    <footer class="row footer">
       <span id="customCount" class="count"></span>
       <button id="openOptions" class="link">詳細設定</button>
-    </div>
+    </footer>
 
     <p id="notSlides" class="warn" hidden>
       Google スライドのタブを開いてから使用してください。

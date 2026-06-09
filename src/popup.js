@@ -21,6 +21,7 @@
   function render() {
     $("enabled").checked = !!settings.enabled;
     $("useBuiltin").checked = !!settings.useBuiltin;
+    $("notesBoost").checked = !!settings.notesBoost;
     const n = (settings.custom || []).length;
     $("customCount").textContent =
       n > 0 ? `選択して登録: ${n} 件` : "選択登録なし";
@@ -46,6 +47,11 @@
 
   $("useBuiltin").addEventListener("change", (e) => {
     settings.useBuiltin = e.target.checked;
+    save();
+  });
+
+  $("notesBoost").addEventListener("change", (e) => {
+    settings.notesBoost = e.target.checked;
     save();
   });
 
