@@ -143,6 +143,86 @@
     }
   }
 
+  // ---- speaker-notes boost ------------------------------------------------
+  //
+  // Open the editor's speaker-notes pane a little by default. Rather than fight
+  // Google's layout with CSS (the pane height is JS-controlled), we simulate a
+  // short drag on the SplitPane handle between the slide canvas and the notes,
+  // so Google's own code reflows the canvas correctly. We do this at most once
+  // per page load, never shrink a pane the user already widened, and silently
+  // no-op if the handle isn't present (e.g. notes hidden, or DOM changed).
+
+  let notesBoosted = false;
+
+  // The editor has more than one SplitPane (the left filmstrip divider is one
+  // too). The canvas/notes divider is the horizontal bar you drag *vertically*,
+  // so it is the visible handle that is wider than it is tall. Pick that one to
+  // avoid ever resizing the filmstrip by mistake.
+  function notesHandle() {
+    const handles = document.querySelectorAll(NB.NOTES_HANDLE_SELECTOR);
+    for (const h of handles) {
+      const r = h.getBoundingClientRect();
+      if (r.width > r.height && r.width > 0 && r.height > 0) return h;
+    }
+    return null;
+  }
+
+  // Current notes-pane height, scoped to the chosen handle's own SplitPane so we
+  // never read the filmstrip's second container.
+  function notesPaneHeight(handle) {
+    const pane =
+      (handle.parentElement &&
+        handle.parentElement.querySelector(NB.NOTES_PANE_SELECTOR)) ||
+      null;
+    return pane ? Math.round(pane.getBoundingClientRect().height) : 0;
+  }
+
+  function dispatchMouse(target, type, x, y) {
+    target.dispatchEvent(
+      new MouseEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        button: 0,
+        clientX: x,
+        clientY: y,
+      })
+    );
+  }
+
+  // Drag the handle up by `dy` pixels (up = taller notes) using a mousedown on
+  // the handle followed by document-level mousemove/up, matching how Closure's
+  // dragger listens once a drag has started.
+  function dragHandleUp(handle, dy) {
+    const r = handle.getBoundingClientRect();
+    const x = Math.round(r.left + r.width / 2);
+    const y0 = Math.round(r.top + r.height / 2);
+    dispatchMouse(handle, "mousedown", x, y0);
+    const steps = 8;
+    for (let i = 1; i <= steps; i++) {
+      dispatchMouse(document, "mousemove", x, y0 - Math.round((dy * i) / steps));
+    }
+    dispatchMouse(document, "mouseup", x, y0 - dy);
+  }
+
+  function boostNotes() {
+    if (notesBoosted || !settings.notesBoost) return;
+    const handle = notesHandle();
+    if (!handle) return; // notes pane not shown yet (or absent)
+    const current = notesPaneHeight(handle);
+    // Already as open as we'd make it (or the user widened it): leave it alone.
+    if (current >= NB.NOTES_BOOST_PX) {
+      notesBoosted = true;
+      return;
+    }
+    notesBoosted = true; // one shot, even if the drag is a partial no-op
+    try {
+      dragHandleUp(handle, NB.NOTES_BOOST_PX - current);
+    } catch (e) {
+      /* layout differs from expectations — leave the pane untouched */
+    }
+  }
+
   // ---- observation --------------------------------------------------------
 
   let scanQueued = false;
@@ -152,6 +232,7 @@
     requestAnimationFrame(() => {
       scanQueued = false;
       scan();
+      boostNotes();
     });
   }
 
@@ -171,6 +252,7 @@
       attributeFilter: ["aria-label", "data-tooltip", "title"],
     });
     scan();
+    boostNotes();
   }
 
   // ---- pick mode ----------------------------------------------------------
@@ -261,6 +343,7 @@
   }
 
   function applySettings(next) {
+    const prevNotesBoost = settings.notesBoost;
     settings = Object.assign({}, NB.DEFAULTS, next || {});
     // Gate the static CSS rules on the current settings.
     document.documentElement.classList.toggle(
@@ -269,6 +352,9 @@
     );
     unhideAll();
     if (settings.enabled) scan();
+    // Newly switched on: allow the one-shot boost to run again.
+    if (settings.notesBoost && !prevNotesBoost) notesBoosted = false;
+    boostNotes();
   }
 
   function load() {

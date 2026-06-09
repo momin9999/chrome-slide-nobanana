@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Slides NoBanana — Beautify ボタン非表示",
   "version": "1.0.0",
-  "description": "Google スライドの「Beautify this slide（スライドを改善/生成）」ボタン（スライドとスピーカーノートの間に出る生成AIボタン）を非表示にします。",
+  "description": "Google スライドの「Beautify this slide（スライドを改善/生成）」ボタン（スライドとスピーカーノートの間に出る生成AIボタン）を非表示にします。スピーカーノート欄を少し広げて表示することもできます。",
   "permissions": ["storage"],
   "icons": {
     "16": "icons/icon16.png",
